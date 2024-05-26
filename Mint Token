@@ -1,0 +1,38 @@
+contract JakeToken is ERC20 {
+//This line declares a new Solidity contract named JakeToken, which inherits from the ERC20 contract. This means that JakeToken contract inherits all the functionality (functions and state variables) defined in the ERC20 contract.
+
+    constructor() ERC20("JakeToken", "JTK") {
+        owner = msg.sender;
+        _mint(msg.sender, 500000); 
+    }
+//This is the constructor function of the JakeToken contract. It is called only once when the contract is deployed. It sets the initial supply of the token to 500,000 units, mints these tokens to the address deploying the contract (msg.sender), and sets the owner of the contract to be the same address.
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "You are not the contract owner");
+        _;
+    }
+//This is a modifier named onlyOwner. Modifiers are used to add additional conditions to functions. In this case, onlyOwner is used to restrict access to certain functions to the owner of the contract.
+
+    function mint(address to, uint256 value) public onlyOwner {
+        _mint(to, value);
+    }
+//This function mint is used to mint new tokens and assign them to a specified address. However, it can only be called by the contract owner, as enforced by the onlyOwner modifier.
+
+    function transfer(address to, uint256 amount) public override returns (bool) {
+        _transfer(_msgSender(), to, amount);
+        return true;
+    }
+//This function transfer allows transferring tokens from the sender's address to a specified address. It overrides the transfer function defined in the ERC20 contract. The _transfer function is used to perform the actual transfer.
+
+    function approve(address spender, uint256 amount) public override returns (bool) {
+        _approve(_msgSender(), spender, amount);
+        return true;
+    }
+//This function approve allows the sender to approve another address to spend tokens on their behalf. It overrides the approve function defined in the ERC20 contract. The _approve function is used to perform the approval.
+
+    function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
+        _transfer(from, to, amount);
+        _approve(from, _msgSender(), allowance(from, _msgSender()) - amount);
+        return true;
+    }
+//This function transferFrom allows transferring tokens from one address to another on behalf of the token owner. It overrides the transferFrom function defined in the ERC20 contract. It first transfers the tokens, then reduces the spender's allowance.
